@@ -6,6 +6,7 @@
 package menu;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.Random;
 /**
  *
  * @author ivan
@@ -16,6 +17,12 @@ public class Menu {
      * @param args the command line arguments
      */
 
+    final static char C = '1', X = '0', S = 's', E = 'e', V = '.';
+
+    final static int START_I = 0, START_J = 0;
+    final static int END_I = 9, END_J = 9;
+    String auxa;
+    public static char[][] laberinto = laberinto_completo();
 
     public static void p_1() {
         Scanner reader = new Scanner(System.in);
@@ -42,12 +49,12 @@ public class Menu {
                     }
                     fil2 = fil + 1;
                     System.out.println("Ingrese la coordenada "+ coordenada + " del punto " + fil2);
-                    matrix[fil][col] = Integer.parseInt(reader.nextLine());                
+                    matrix[fil][col] = Integer.parseInt(reader.nextLine());
                 } catch (NumberFormatException e) {
                     System.out.println("Debes insertar un número\n Volvamos a empezar....\n ");
                     p_1();
                 }
-            
+
             }
         }
 
@@ -109,8 +116,174 @@ public class Menu {
     }
 
     public static void p_2() {
-        System.out.println("En construcción");
+        Menu maze = new Menu();
+        maze.imprimir();
 
+        System.out.println("\n\nEncuentra una ruta recursiva: ");
+        maze.resolverRecursion();
+    }
+
+    public int tamLaberinto() {
+        return laberinto.length;
+    }
+
+    public static char[][] laberinto_completo() {
+        char[][]  complete_lab = new char[10][10];
+        char aux;
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (i == 0 && j == 0) {
+                    complete_lab[i][j] = S;
+                } else if (i == 9 && j == 9){
+                    complete_lab[i][j] = E;
+                } else {
+                    Random r = new Random();
+                    String alphabet = "101";
+                    aux = alphabet.charAt(r.nextInt(alphabet.length()));
+                    if (aux == '0') {
+                        complete_lab[i][j] = X;
+                    } else if (aux == '1') {
+                        complete_lab[i][j] = C;
+                    }
+                }
+            }
+        }
+
+        return complete_lab;
+
+    }
+
+
+    public void imprimir() {
+        for (int i = 0; i < tamLaberinto(); i++) {
+            for (int j = 0; j < tamLaberinto(); j++) {
+                System.out.print(laberinto[i][j]);
+                System.out.print(' ');
+            }
+            System.out.println();
+        }
+    }
+
+    public char marcar(int i, int j, char valor) {
+        assert (isInMaze(i, j));
+        char tmp = laberinto[i][j];
+        laberinto[i][j] = valor;
+        return tmp;
+    }
+
+    public char marcar(MazePos pos, char value) {
+        return marcar(pos.i(), pos.j(), value);
+    }
+
+    public boolean isMarked(int i, int j) {
+        assert (isInMaze(i, j));
+        return (laberinto[i][j] == V);
+    }
+
+    public boolean isMarked(MazePos pos) {
+        return isMarked(pos.i(), pos.j());
+    }
+
+    public boolean isClear(int i, int j) {
+        assert (isInMaze(i, j));
+        return (laberinto[i][j] != X && laberinto[i][j] != V);
+    }
+
+    public boolean isClear(MazePos pos) {
+        return isClear(pos.i(), pos.j());
+    }
+
+    //true if cell is within maze 
+    public boolean isInMaze(int i, int j) {
+        if (i >= 0 && i < tamLaberinto() && j >= 0 && j < tamLaberinto()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //true if cell is within maze 
+    public boolean isInMaze(MazePos pos) {
+        return isInMaze(pos.i(), pos.j());
+    }
+
+    public boolean isFinal(int i, int j) {
+        return (i == Menu.END_I && j == Menu.END_J);
+    }
+
+    public boolean isFinal(MazePos pos) {
+        return isFinal(pos.i(), pos.j());
+    }
+
+    @Override
+    public char[][] clone() {
+
+        char[][] mazeCopy = new char[tamLaberinto()][tamLaberinto()];
+        for (int i = 0; i < tamLaberinto(); i++) {
+            System.arraycopy(laberinto[i], 0, mazeCopy[i], 0, tamLaberinto());
+        }
+        return mazeCopy;
+    }
+
+    public void restaurar(char[][] savedMaze) {
+        for (int i = 0; i < tamLaberinto(); i++) {
+            for (int j = 0; j < tamLaberinto(); j++) {
+                laberinto[i][j] = savedMaze[i][j];
+            }
+        }
+    }
+
+    public void resolverRecursion() {
+
+        if (solve(new MazePos(START_I, START_J))) {
+            System.out.println("lo tengo: ");
+        } else {
+            System.out.println("Estás atrapado en el laberinto.");
+        }
+        imprimir();
+
+    }
+
+    public boolean solve(MazePos pos) {
+
+        //base case
+        if (!isInMaze(pos)) {
+            return false;
+        }
+        if (isFinal(pos)) {
+            return true;
+        }
+        if (!isClear(pos)) {
+            return false;
+        }
+
+        //posición actual debe ser clara
+        assert (isClear(pos));
+
+
+        marcar(pos, V);
+
+        if (solve(pos.irSur())) {
+
+            return true;
+        }
+
+        if (solve(pos.IrOeste())) {
+
+            return true;
+        }
+
+        if (solve(pos.irNorte())) {
+            return true;
+        }
+
+        if (solve(pos.IrEste())) {
+            return true;
+        }
+
+        marcar(pos, C);
+
+        return false;
     }
 
     public static void p_3() {
@@ -146,6 +319,46 @@ public class Menu {
 
     }
 
+    class MazePos {
+
+        int i, j;
+
+        public MazePos(int i, int j) {
+            this.i = i;
+            this.j = j;
+        }
+
+        ;
+        public int i() {
+            return i;
+        }
+
+        public int j() {
+            return j;
+        }
+
+        public void print() {
+            System.out.println("(" + i + "," + j + ")");
+        }
+
+        public MazePos irNorte() {
+            return new MazePos(i - 1, j);
+        }
+
+        public MazePos irSur() {
+            return new MazePos(i + 1, j);
+        }
+
+        public MazePos IrEste() {
+            return new MazePos(i, j + 1);
+        }
+
+        public MazePos IrOeste() {
+            return new MazePos(i, j - 1);
+        }
+
+    };
+    
     public static void main(String[] args) {
         Scanner sn = new Scanner(System.in);
         boolean salir = false;
@@ -155,8 +368,8 @@ public class Menu {
 
             System.out.println("1. Dividir y Vencer");
             System.out.println("2. Programación Dinámica");
-            System.out.println("3. Opcion 3");
-            System.out.println("4. Vuelta Atrás");
+            System.out.println("3. Vuelta Atrás");
+            System.out.println("4. Salir");
 
             try {
 
