@@ -28,7 +28,7 @@ public class Menu {
         Scanner reader = new Scanner(System.in);
         String puntos;
         double datos;
-        System.out.println("Ingrese la cantidad de puntos a validar\n ");
+        System.out.println("Ingresa la cantidad de puntos a validar\n ");
         puntos = reader.nextLine();
         int filas = Integer.parseInt(puntos);
         int columnas = 2;
@@ -48,7 +48,7 @@ public class Menu {
                         coordenada = "y";
                     }
                     fil2 = fil + 1;
-                    System.out.println("Ingrese la coordenada "+ coordenada + " del punto " + fil2);
+                    System.out.println("Ingresa la coordenada "+ coordenada + " del punto " + fil2);
                     matrix[fil][col] = Integer.parseInt(reader.nextLine());
                 } catch (NumberFormatException e) {
                     System.out.println("Debes insertar un número\n Volvamos a empezar....\n ");
@@ -117,9 +117,9 @@ public class Menu {
 
     public static void p_2() {
         Menu maze = new Menu();
+        System.out.println("\n***** Modelo del laberinto ****** \n");
         maze.imprimir();
-
-        System.out.println("\n\nEncuentra una ruta recursiva: ");
+        System.out.println("\n\nEncncontrando una ruta recursiva.....: ");
         maze.resolverRecursion();
     }
 
@@ -152,7 +152,6 @@ public class Menu {
         return complete_lab;
 
     }
-
 
     public void imprimir() {
         for (int i = 0; i < tamLaberinto(); i++) {
@@ -193,7 +192,7 @@ public class Menu {
         return isClear(pos.i(), pos.j());
     }
 
-    //true if cell is within maze 
+    //true if cell is within maze
     public boolean isInMaze(int i, int j) {
         if (i >= 0 && i < tamLaberinto() && j >= 0 && j < tamLaberinto()) {
             return true;
@@ -202,7 +201,7 @@ public class Menu {
         }
     }
 
-    //true if cell is within maze 
+    //true if cell is within maze
     public boolean isInMaze(MazePos pos) {
         return isInMaze(pos.i(), pos.j());
     }
@@ -236,12 +235,15 @@ public class Menu {
     public void resolverRecursion() {
 
         if (solve(new MazePos(START_I, START_J))) {
-            System.out.println("lo tengo: ");
+            System.out.println("\nlo tengo!!!!: \n");
         } else {
-            System.out.println("Estás atrapado en el laberinto.");
+            System.out.println("\nEstás atrapado en el laberinto. :( \n");
         }
         imprimir();
 
+        System.out.println("\nAdios\n");
+
+        System.exit(1);
     }
 
     public boolean solve(MazePos pos) {
@@ -314,7 +316,7 @@ public class Menu {
         menor_puntos[1][1] = y_2;
         menor_puntos[2][0] = menor_distancia;
         menor_puntos[2][1] = 0;
-        //System.out.println("x-1 " + x_1 + " x-2 " + y_1 + " y-1 " + x_2 + " y-2 " + y_2 + " result " + menor_distancia);
+
         return menor_puntos;
 
     }
@@ -358,7 +360,7 @@ public class Menu {
         }
 
     };
-    
+
     public static void main(String[] args) {
         Scanner sn = new Scanner(System.in);
         boolean salir = false;
